@@ -21,9 +21,9 @@ jobs:
           "quark", 
           "cloudHypervisor", 
           # "kuasar.image", 
-          "vmlinux.bin", 
-          "containerd-shim-kuasar-vmm-v2", 
-          "containerd-shim-kuasar-wasm-v2"
+          # "vmlinux.bin", 
+          # "containerd-shim-kuasar-vmm-v2", 
+          # "containerd-shim-kuasar-wasm-v2"
         ]
         include:
           - directories: wasmedge
@@ -35,8 +35,8 @@ jobs:
             command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor
           # - directories: kuasar.image
           #   command: bin/kuasar.img GUESTOS_IMAGE=ubuntu
-          - directories: vmlinux.bin
-            command: bin/vmlinux.bin
+          # - directories: vmlinux.bin
+          #   command: bin/vmlinux.bin
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -78,4 +78,5 @@ jobs:
       #   if: ${{ matrix.wasmEdge }}
       #   run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
       - name: Build
+        working-directory: shim
         run: make ${{ matrix.command }} && ls bin
