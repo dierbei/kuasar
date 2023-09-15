@@ -10,14 +10,14 @@ BIN_DIR := /usr/local/bin
 SYSTEMD_SERVICE_DIR := /usr/lib/systemd/system
 SYSTEMD_CONF_DIR := /etc/sysconfig
 
-.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install 
+.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install install/containerd
 
 all: vmm quark wasm
 
 bin/vmm-sandboxer:
 	@cd vmm/sandbox && cargo build --release --features=${HYPERVISOR}
 	@mkdir -p bin && cp vmm/sandbox/target/release/vmm-sandboxer bin/vmm-sandboxer
-
+	
 bin/vmm-task:
 	@cd vmm/task && cargo build --release --target=${ARCH}-unknown-linux-musl
 	@mkdir -p bin && cp vmm/task/target/${ARCH}-unknown-linux-musl/release/vmm-task bin/vmm-task
@@ -28,11 +28,11 @@ bin/vmlinux.bin:
 
 bin/kuasar.img:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh image
-	@mkdir -p bin && cp /tmp/kuasar.img bin/kuasar.img && rm /tmp/kuasar.img
+	@mkdir -p bin && cp /tmp/kuasar.img bin/kuasar.img && sudo rm /tmp/kuasar.img
 
 bin/kuasar.initrd:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh initrd
-	@mkdir -p bin && cp /tmp/kuasar.initrd bin/kuasar.initrd && rm /tmp/kuasar.initrd
+	@mkdir -p bin && cp /tmp/kuasar.initrd bin/kuasar.initrd && sudo rm /tmp/kuasar.initrd
 
 bin/wasm-sandboxer:
 	@cd wasm && cargo build --release --features=${WASM_RUNTIME}
@@ -85,5 +85,10 @@ install-quark:
 	@install -p -m 550 bin/quark-sandboxer ${DEST_DIR}${BIN_DIR}/quark-sandboxer
 	@install -d -m 750 ${DEST_DIR}${SYSTEMD_SERVICE_DIR}
 	@install -p -m 640 quark/service/kuasar-quark.service ${DEST_DIR}${SYSTEMD_SERVICE_DIR}/kuasar-quark.service
+
+install/containerd:
+	curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
+	mkdir bin && tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+	cp docs/config.toml bin/
 
 install: all install-vmm install-wasm install-quark
