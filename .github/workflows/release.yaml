@@ -1,0 +1,186 @@
+name: release
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - '**/v[0-9]+.[0-9]+.*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  buildSandboxer:
+    strategy:
+      matrix:
+        directories: [
+          "wasmedge",
+          "quark", 
+          "cloud_hypervisor",
+        ]
+        include:
+          - directories: wasmedge
+            command: bin/wasm-sandboxer WASM_RUNTIME=wasmedge
+            wasmEdge: 0.11.2
+          - directories: quark
+            command: bin/quark-sandboxer
+          - directories: cloud_hypervisor
+            command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor && cp vmm/sandbox/config_clh.toml bin/config_clh.toml
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - run: rustup toolchain install nightly --component rustfmt
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1.1.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install WasmEdge
+        if: ${{ matrix.wasmEdge }}
+        run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
+      - name: Build
+        run: make ${{ matrix.command }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.directories }}
+          path: bin/
+      
+  buildShim:
+    strategy:
+      matrix:
+        directories: [
+          "containerd-shim-kuasar-vmm-v2", 
+          "containerd-shim-kuasar-wasm-v2"
+        ]
+        include:
+          - directories: containerd-shim-kuasar-vmm-v2
+            command: bin/containerd-shim-kuasar-vmm-v2
+          - directories: containerd-shim-kuasar-wasm-v2
+            command: bin/containerd-shim-kuasar-wasm-v2
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build
+        working-directory: shim
+        run: make ${{ matrix.command }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.directories }}
+          path: shim/bin/
+        
+  kuasar-image:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build kuasar.img
+        run: RUNTIME=docker make bin/kuasar.img
+        working-directory: .
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kuasar.img
+          path: bin/
+  
+  vmlinux-bin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build vmlinux.bin
+        run: make bin/vmlinux.bin
+        working-directory: .
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: vmlinux.bin
+          path: bin/
+
+  containerd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      CONTAINERD_VERSION: "1.7.0"
+      CONFIG_FILE: "config.toml"
+      BIN_DIR: "bin"
+    steps:
+      - name: Download and Extract Containerd
+        run: |
+          curl -LJO https://github.com/containerd/containerd/releases/download/v${{ env.CONTAINERD_VERSION }}/containerd-${{ env.CONTAINERD_VERSION }}-linux-amd64.tar.gz
+          mkdir ${{ env.BIN_DIR }} && tar -C ${{ env.BIN_DIR }} -xzvf containerd-${{ env.CONTAINERD_VERSION }}-linux-amd64.tar.gz
+      - name: Generate Config File
+        run: |
+          cat << EOL | sudo tee ${{ env.BIN_DIR }}/${{ env.CONFIG_FILE }}
+          version = 2
+
+          [plugins."io.containerd.grpc.v1.cri"]
+            disable_apparmor = true
+
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.vmm]
+            runtime_type = "io.containerd.kuasar.v1"
+            sandboxer = "vmm"
+            io_type = "hvsock"
+
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.quark]
+            runtime_type = "io.containerd.quark.v1"
+            sandboxer = "quark"
+
+          [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.wasm]
+            runtime_type = "io.containerd.wasm.v1"
+            sandboxer = "wasm"
+
+          [proxy_plugins.vmm]
+            type = "sandbox"
+            address = "/run/vmm-sandboxer.sock"
+
+          [proxy_plugins.quark]
+            type = "sandbox"
+            address = "/run/quark-sandboxer.sock"
+
+          [proxy_plugins.wasm]
+            type = "sandbox"
+            address = "/run/wasm-sandboxer.sock"
+          EOL
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: containerd
+          path: ${{ env.BIN_DIR }}
+
+  release:
+    permissions:
+      contents: write
+    needs:
+      - buildSandboxer
+      - buildShim
+      - kuasar-image
+      - vmlinux-bin
+      - containerd
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set RELEASE_VERSION ENV var
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=kuasar-${GITHUB_REF:10}-vendor.tar.gz" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v3
+        with:
+          path: _artifacts
+      - name: create release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p _dist
+          gh release create ${{ env.RELEASE_VERSION }}
+          # Recursively find all files
+          find ./_artifacts -type f | xargs -I {} cp {} _dist/
+          tar -czvf ${{ env.ARCHIVE_NAME }} -C _dist .
+          gh release upload ${{ env.RELEASE_VERSION }} ${{ env.ARCHIVE_NAME }}

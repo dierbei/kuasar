@@ -17,18 +17,18 @@ all: vmm quark wasm
 bin/vmm-sandboxer:
 	@cd vmm/sandbox && cargo build --release --features=${HYPERVISOR}
 	@mkdir -p bin && cp vmm/sandbox/target/release/vmm-sandboxer bin/vmm-sandboxer
-
+	
 bin/vmm-task:
 	@cd vmm/task && cargo build --release --target=${ARCH}-unknown-linux-musl
 	@mkdir -p bin && cp vmm/task/target/${ARCH}-unknown-linux-musl/release/vmm-task bin/vmm-task
 
 bin/vmlinux.bin:
 	@bash -x vmm/scripts/kernel/${HYPERVISOR}/build.sh ${KERNEL_VERSION}
-	@mkdir -p bin && cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
+	@mkdir -p bin && sudo cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && sudo rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
 
 bin/kuasar.img:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh image
-	@mkdir -p bin && cp /tmp/kuasar.img bin/kuasar.img && rm /tmp/kuasar.img
+	@mkdir -p bin && sudo cp /tmp/kuasar.img bin/kuasar.img && sudo rm /tmp/kuasar.img
 
 bin/kuasar.initrd:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh initrd
