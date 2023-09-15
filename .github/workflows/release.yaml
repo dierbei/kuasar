@@ -79,6 +79,6 @@ jobs:
       #   if: ${{ matrix.wasmEdge }}
       #   run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
       - name: Build
-        # working-directory: shim
+        working-directory: shim
         run: pwd && ls && make ${{ matrix.command }} && ls bin
         # run: pwd && ls
