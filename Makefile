@@ -17,6 +17,9 @@ all: vmm quark wasm
 bin/vmm-sandboxer:
 	@cd vmm/sandbox && cargo build --release --features=${HYPERVISOR}
 	@mkdir -p bin && cp vmm/sandbox/target/release/vmm-sandboxer bin/vmm-sandboxer
+	@if [ "${HYPERVISOR}" = "cloud_hypervisor" ]; then \
+		cp vmm/sandbox/config_clh.toml bin/config_clh.toml; \
+	fi
 
 bin/vmm-task:
 	@cd vmm/task && cargo build --release --target=${ARCH}-unknown-linux-musl
