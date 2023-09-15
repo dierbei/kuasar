@@ -1,0 +1,131 @@
+name: release
+
+concurrency:
+  group: release-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - '**/v[0-9]+.[0-9]+.*'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  vmm:
+    strategy:
+      matrix:
+        features: ["cloud_hypervisor"]
+    
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build vmm
+        run: make vmm HYPERVISOR=${{ matrix.features }} RUNTIME=docker
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.features }}
+          path: |
+            bin/kuasar.img 
+            bin/vmlinux.bin 
+            bin/vmm-sandboxer
+  
+  quark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build quark
+        run: make quark
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: quark
+          path: bin/quark-sandboxer
+  
+  wasm: 
+    strategy:
+      matrix:
+        features: ["wasmedge"]
+  
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install WasmEdge
+        if: ${{ matrix.features }} == 'wasmedge'
+        run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v 0.11.2 >> /dev/null
+      - name: Build wasm
+        run: make wasm WASM_RUNTIME=${{ matrix.features }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.features }}
+          path: bin/wasm-sandboxer
+  
+  shim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build shim
+        working-directory: shim
+        run: make all
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: shim
+          path: | 
+            bin/containerd-shim-kuasar-vmm-v2 
+            bin/containerd-shim-kuasar-wasm-v2
+
+  containerd:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build Containerd
+        run: sudo -E ./scripts/build/build-containerd.sh
+        shell: bash
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: containerd
+          path: | 
+            bin/containerd 
+            bin/config.toml
+
+  release:
+    permissions:
+      contents: write
+    needs:
+      - vmm
+      - quark
+      - wasm
+      - shim
+      - containerd
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set RELEASE_VERSION ENV var
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=kuasar-${GITHUB_REF:10}-linux-amd64.tar.gz" >> $GITHUB_ENV
+          echo "VENDOR_NAME=kuasar-${GITHUB_REF:10}-vendor.tar.gz" >> $GITHUB_ENV
+      - name: Package vendor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sudo -E ./scripts/build/cargo-vendor.sh
+        shell: bash
+      - uses: actions/download-artifact@v3
+        with:
+          path: _artifacts
+      - name: Package release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: sudo -E ./scripts/build/github-release.sh
+        shell: bash
