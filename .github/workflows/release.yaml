@@ -13,14 +13,14 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  checks:
+  buildSandboxer:
     strategy:
       matrix:
         directories: [
           "wasmedge",
           "quark", 
           "cloudHypervisor", 
-          "kuasar.image", 
+          # "kuasar.image", 
           "vmlinux.bin", 
           "containerd-shim-kuasar-vmm-v2", 
           "containerd-shim-kuasar-wasm-v2"
@@ -33,11 +33,11 @@ jobs:
             command: bin/quark-sandboxer
           - directories: cloudHypervisor
             command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor
-          - directories: kuasar.image
-            command: bin/kuasar.img GUESTOS_IMAGE=ubuntu
+          # - directories: kuasar.image
+          #   command: bin/kuasar.img GUESTOS_IMAGE=ubuntu
           - directories: vmlinux.bin
             command: bin/vmlinux.bin
-    runs-on: centos:7
+    runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
@@ -52,6 +52,30 @@ jobs:
         run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
       - name: Build
         run: make ${{ matrix.command }} && ls bin
-      # - name: BuildShim
+  buildShim:
+    strategy:
+      matrix:
+        directories: [
+          "containerd-shim-kuasar-vmm-v2", 
+          "containerd-shim-kuasar-wasm-v2"
+        ]
+        include:
+          - directories: containerd-shim-kuasar-vmm-v2
+            command: bin/containerd-shim-kuasar-vmm-v2
+          - directories: containerd-shim-kuasar-wasm-v2
+            command: bin/containerd-shim-kuasar-wasm-v2
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # - uses: actions/checkout@v3
+      # - run: rustup toolchain install nightly --component rustfmt
+      # - name: Install Protoc
+      #   uses: arduino/setup-protoc@v1.1.2
+      #   with:
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Install WasmEdge
       #   if: ${{ matrix.wasmEdge }}
       #   run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
+      - name: Build
+        run: make ${{ matrix.command }} && ls bin
