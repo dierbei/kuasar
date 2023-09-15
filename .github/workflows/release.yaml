@@ -89,4 +89,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: pwd && ls && CONTAINER_RUNTIME=docker make ${{ matrix.command }} && ls bin
+        run: pwd && ls && RUNTIME=docker make ${{ matrix.command }} && ls bin

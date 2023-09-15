@@ -9,6 +9,8 @@ INSTALL_DIR := /var/lib/kuasar
 BIN_DIR := /usr/local/bin
 SYSTEMD_SERVICE_DIR := /usr/lib/systemd/system
 SYSTEMD_CONF_DIR := /etc/sysconfig
+# Build the kuasar.img container runtime environment
+# CONTAINER_RUNTIME ?= containerd 
 
 .PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install 
 
