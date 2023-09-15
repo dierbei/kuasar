@@ -89,5 +89,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        working-directory: shim
         run: pwd && ls && make ${{ matrix.command }} && ls bin
