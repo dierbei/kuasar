@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         directories: [
-          "wasmEdge",
+          "wasmedge",
           "quark", 
           "cloudHypervisor", 
           "kuasar.image", 
@@ -26,15 +26,15 @@ jobs:
           "containerd-shim-kuasar-wasm-v2"
         ]
         include:
-          - directories: wasm
-            command: bin/wasm-sandboxer WASM_RUNTIME=wasmEdge
+          - directories: wasmedge
+            command: bin/wasm-sandboxer WASM_RUNTIME=wasmedge
             wasmEdge: 0.11.2
           - directories: quark
             command: bin/quark-sandboxer
           - directories: cloudHypervisor
             command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor
           - directories: kuasar.image
-            command: bin/kuasar.img
+            command: bin/kuasar.img GUESTOS_IMAGE=ubuntu
           - directories: vmlinux.bin
             command: bin/vmlinux.bin
     runs-on: ubuntu-latest
