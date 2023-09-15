@@ -74,7 +74,7 @@ jobs:
         working-directory: shim
         run: pwd && ls && make ${{ matrix.command }} && ls bin
         
-  buildShim:
+  test:
     strategy:
       matrix:
         directories: [
