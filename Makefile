@@ -26,6 +26,7 @@ bin/vmm-task:
 	@mkdir -p bin && cp vmm/task/target/${ARCH}-unknown-linux-musl/release/vmm-task bin/vmm-task
 
 bin/vmlinux.bin:
+	sudo bash -x vmm/scripts/kernel/${{ env.HYPERVISOR }}/build.sh ${{ env.KERNEL_VERSION }}
 	@bash -x vmm/scripts/kernel/${HYPERVISOR}/build.sh ${KERNEL_VERSION}
 	@mkdir -p bin && cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
 
