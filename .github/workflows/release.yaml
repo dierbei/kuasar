@@ -89,7 +89,7 @@ jobs:
           name: ${{ matrix.directories }}
           path: ./bin/
   
-  vmlinux.bin:
+  vmlinux-bin:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
