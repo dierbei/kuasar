@@ -28,7 +28,7 @@ jobs:
           - directories: quark
             command: bin/quark-sandboxer
           - directories: cloud_hypervisor
-            command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor && cp vmm/sandbox/config_clh.toml bin/config_clh.toml
+            command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
