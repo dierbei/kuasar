@@ -31,7 +31,7 @@ bin/vmlinux.bin:
 
 bin/kuasar.img:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh image
-	@mkdir -p bin && sudo cp /tmp/kuasar.img bin/kuasar.img && rm /tmp/kuasar.img
+	@mkdir -p bin && sudo cp /tmp/kuasar.img bin/kuasar.img && sudo rm /tmp/kuasar.img
 
 bin/kuasar.initrd:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh initrd
