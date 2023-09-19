@@ -16,7 +16,7 @@
 exit_flag=0
 export IMAGE_NAME=${IMAGE_NAME:-"centos:7"}
 export ROOTFS_DIR=${ROOTFS_DIR:-"/tmp/kuasar-rootfs"}
-export CONTAINER_RUNTIME=${RUNTIME:-"container"}
+export CONTAINER_RUNTIME=${RUNTIME:-"containerd"}
 CONTAINERD_NS=${CONTAINERD_NS:-"default"}
 
 function fn_check_result() {
