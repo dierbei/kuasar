@@ -74,7 +74,7 @@ jobs:
         working-directory: shim
         run: pwd && ls && make ${{ matrix.command }} && ls bin
         
-  test:
+  kuasar-image:
     strategy:
       matrix:
         directories: [
@@ -90,3 +90,16 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build
         run: pwd && ls && RUNTIME=docker make ${{ matrix.command }} && ls bin
+  
+  release:
+    permissions:
+      contents: write
+    needs:
+      - buildSandboxer
+      - buildShim
+      - kuasar-image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup buildx
+        run: ls && ls bin
