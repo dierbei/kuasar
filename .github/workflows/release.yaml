@@ -45,7 +45,7 @@ jobs:
       - name: Build
         run: make ${{ matrix.command }} && ls bin
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.directories }}
           path: bin/
@@ -71,7 +71,7 @@ jobs:
         working-directory: shim
         run: pwd && ls && make ${{ matrix.command }} && ls bin
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: shim/${{ matrix.directories }}
           path: bin/
@@ -85,7 +85,7 @@ jobs:
       - name: Build
         run: RUNTIME=docker make bin/kuasar.img
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: kuasar.img
           path: bin/
@@ -99,7 +99,7 @@ jobs:
       - name: Build
         run: make bin/vmlinux.bin
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: vmlinux.bin
           path: bin/
@@ -119,4 +119,4 @@ jobs:
         with:
           path: ./bin
       - name: list
-        run: ls && ls bin
+        run: ls -R
