@@ -81,6 +81,7 @@ jobs:
     timeout-minutes: 30
 
     steps:
+      - uses: actions/checkout@v3
       - name: Build
         run: RUNTIME=docker make bin/kuasar.img
       - name: Upload Artifacts
