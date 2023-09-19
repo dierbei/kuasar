@@ -19,7 +19,7 @@ jobs:
         directories: [
           "wasmedge",
           "quark", 
-          "cloudHypervisor",
+          "cloud_hypervisor",
         ]
         include:
           - directories: wasmedge
@@ -27,7 +27,7 @@ jobs:
             wasmEdge: 0.11.2
           - directories: quark
             command: bin/quark-sandboxer
-          - directories: cloudHypervisor
+          - directories: cloud_hypervisor
             command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -48,7 +48,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.directories }}
-          path: ./bin/
+          path: bin/
       
   buildShim:
     strategy:
@@ -74,24 +74,29 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.directories }}
-          path: ./bin/
+          path: bin/
         
   kuasar-image:
-    strategy:
-      matrix:
-        directories: [
-          "kuasar.image", 
-        ]
-        include:
-          - directories: kuasar.image
-            command: bin/kuasar.img
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Build
+        run: RUNTIME=docker make bin/kuasar.img
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.directories }}
+          path: ./bin/
+  
+  vmlinux.bin:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v3
       - name: Build
-        run: pwd && ls && RUNTIME=docker make ${{ matrix.command }} && ls bin
+        run: make bin/vmlinux.bin
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -111,6 +116,5 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           path: ./bin
-      # - uses: actions/checkout@v3
       - name: list
         run: ls && ls bin

@@ -27,7 +27,7 @@ bin/vmm-task:
 
 bin/vmlinux.bin:
 	@bash -x vmm/scripts/kernel/${HYPERVISOR}/build.sh ${KERNEL_VERSION}
-	@mkdir -p bin && cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
+	@mkdir -p bin && sudo cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && sudo rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
 
 bin/kuasar.img:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh image
