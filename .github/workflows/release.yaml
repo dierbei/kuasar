@@ -43,7 +43,7 @@ jobs:
         if: ${{ matrix.wasmEdge }}
         run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
       - name: Build
-        run: make ${{ matrix.command }} && ls bin
+        run: make ${{ matrix.command }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build
         working-directory: shim
-        run: pwd && ls && make ${{ matrix.command }} && ls bin
+        run: pwd && ls && make ${{ matrix.command }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -179,4 +179,4 @@ jobs:
           find ./_artifacts -type f -exec cp \{} _dist/ \;
           ls _dist
           tar -czvf kuasar-v${{ env.RELEASE_VERSION }}-vendor.tar.gz -C _dist .
-          gh release upload ${{ env.RELEASE_VERSION }} artifacts_dist.tar.gz
+          gh release upload ${{ env.RELEASE_VERSION }} kuasar-v${{ env.RELEASE_VERSION }}-vendor.tar.gz
