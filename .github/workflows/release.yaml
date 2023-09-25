@@ -177,5 +177,6 @@ jobs:
           mkdir -p _dist
           gh release create ${{ env.RELEASE_VERSION }}
           find ./_artifacts -type f -exec cp \{} _dist/ \;
+          ls _dist
           tar -czvf kuasar-v${{ env.RELEASE_VERSION }}-vendor.tar.gz -C _dist .
           gh release upload ${{ env.RELEASE_VERSION }} artifacts_dist.tar.gz
