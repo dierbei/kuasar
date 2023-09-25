@@ -31,7 +31,6 @@ jobs:
             command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor && cp vmm/sandbox/config_clh.toml bin/config_clh.toml
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v3
       - run: rustup toolchain install nightly --component rustfmt
@@ -64,12 +63,11 @@ jobs:
             command: bin/containerd-shim-kuasar-wasm-v2
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v3
       - name: Build
         working-directory: shim
-        run: pwd && ls && make ${{ matrix.command }}
+        run: make ${{ matrix.command }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -79,11 +77,11 @@ jobs:
   kuasar-image:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v3
-      - name: Build
+      - name: Build kuasar.img
         run: RUNTIME=docker make bin/kuasar.img
+        working-directory: .
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -93,11 +91,11 @@ jobs:
   vmlinux-bin:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
     steps:
       - uses: actions/checkout@v3
-      - name: Build
+      - name: Build vmlinux.bin
         run: make bin/vmlinux.bin
+        working-directory: .
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -107,13 +105,18 @@ jobs:
   containerd:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-
+    env:
+      CONTAINERD_VERSION: "1.7.0"
+      CONFIG_FILE: "config.toml"
+      BIN_DIR: "bin"
     steps:
-      - name: Build
+      - name: Download and Extract Containerd
         run: |
-          curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-          mkdir bin && tar Cxzvf bin containerd-1.7.0-linux-amd64.tar.gz
-          sudo tee bin/config.toml << EOL
+          curl -LJO https://github.com/containerd/containerd/releases/download/v${{ env.CONTAINERD_VERSION }}/containerd-${{ env.CONTAINERD_VERSION }}-linux-amd64.tar.gz
+          mkdir ${{ env.BIN_DIR }} && tar -C ${{ env.BIN_DIR }} -xzvf containerd-${{ env.CONTAINERD_VERSION }}-linux-amd64.tar.gz
+      - name: Generate Config File
+        run: |
+          cat << EOL | sudo tee ${{ env.BIN_DIR }}/${{ env.CONFIG_FILE }}
           version = 2
 
           [plugins."io.containerd.grpc.v1.cri"]
@@ -150,7 +153,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: containerd
-          path: bin
+          path: ${{ env.BIN_DIR }}
 
   release:
     permissions:
@@ -165,7 +168,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set RELEASE_VERSION ENV var
-        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+        run: |
+          echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+          echo "ARCHIVE_NAME=kuasar-${GITHUB_REF:10}-vendor.tar.gz" >> $GITHUB_ENV
       - uses: actions/download-artifact@v3
         with:
           path: _artifacts
@@ -173,10 +178,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          ls _artifacts
           mkdir -p _dist
           gh release create ${{ env.RELEASE_VERSION }}
-          find ./_artifacts -type f -exec cp \{} _dist/ \;
-          ls _dist
-          tar -czvf kuasar-v${{ env.RELEASE_VERSION }}-vendor.tar.gz -C _dist .
-          gh release upload ${{ env.RELEASE_VERSION }} kuasar-v${{ env.RELEASE_VERSION }}-vendor.tar.gz
+          # Recursively find all files
+          find ./_artifacts -type f | xargs -I {} cp {} _dist/
+          tar -czvf ${{ env.ARCHIVE_NAME }} -C _dist .
+          gh release upload ${{ env.RELEASE_VERSION }} ${{ env.ARCHIVE_NAME }}
