@@ -181,12 +181,13 @@ jobs:
           gh release create ${{ github.ref }} --generate-notes --prerelease
 
           TEMP_DIR=$(mktemp -d)
+          echo $TEMP_DIR
 
           find ./bin/* -type f -exec cp --parents \{\} ${TEMP_DIR}/ \;
 
+          ls $TEMP_DIR
           tar -czvf kuasar-v${VERSION}-vendor.tar.gz -C ${TEMP_DIR} .
 
           gh release upload ${RELEASE_NAME} kuasar-v${VERSION}-vendor.tar.gz
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_NAME: ${{ needs.generate.outputs.crate }}/${{ needs.generate.outputs.version }}
