@@ -171,7 +171,9 @@ jobs:
         run: ls -R
       - name: Collect and Upload Files
         run: |
-          VERSION=$(echo ${{ github.ref }} | sed 's#refs/tags/##')
+          VERSION=$${{ github.ref }}
+
+          echo $VERSION
 
           gh release create ${{ github.ref }} --generate-notes --prerelease
 
