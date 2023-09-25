@@ -178,4 +178,4 @@ jobs:
           gh release create ${{ env.RELEASE_VERSION }}
           find ./_artifacts -type f -exec cp --parents \{} _dist/ \;
           tar -czvf artifacts_dist.tar.gz -C _dist .
-          gh release upload ${{ env.RELEASE_VERSION }}
+          gh release upload ${{ env.RELEASE_VERSION }} artifacts_dist.tar.gz
