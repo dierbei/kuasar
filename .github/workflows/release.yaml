@@ -173,5 +173,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          ls _artifacts
+          mkdir -p _dist
           gh release create ${{ env.RELEASE_VERSION }}
-          for f in ./_artifacts/*/*/*; do gh release upload ${{ env.RELEASE_VERSION }} $f; done
+          find ./_artifacts -type f -exec cp --parents \{} _dist/ \;
+          tar -czvf artifacts_dist.tar.gz -C _dist .
+          gh release upload ${{ env.RELEASE_VERSION }}
