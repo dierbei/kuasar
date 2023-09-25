@@ -163,6 +163,7 @@ jobs:
       - containerd
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Download All Artifacts
         uses: actions/download-artifact@v2
         with:
@@ -171,7 +172,9 @@ jobs:
         run: ls -R
       - name: Collect and Upload Files
         run: |
-          VERSION=$${{ github.ref }}
+          ref="${{ github.ref }}"
+          version="${ref##*/v}"
+          echo "VERSION=$version" >> $GITHUB_ENV
 
           echo $VERSION
 
