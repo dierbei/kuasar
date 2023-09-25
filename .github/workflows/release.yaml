@@ -164,37 +164,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v2
+      - name: Set RELEASE_VERSION ENV var
+        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
+      - uses: actions/download-artifact@v3
         with:
-          path: ./bin
-      - name: list
-        run: ls -R
-      - name: Collect and Upload Files
-        run: |
-          ref="${{ github.ref }}"
-          version="${ref##*/v}"
-          echo "VERSION=$version" >> $GITHUB_ENV
-          
-          # 这里，我们设定 RELEASE_NAME 为提取出的版本号，你可以根据实际需求进行修改
-          RELEASE_NAME="kuasar-$version"
-          echo "RELEASE_NAME=$RELEASE_NAME" >> $GITHUB_ENV
-
-          echo "Version: $version"
-          echo "Release Name: $RELEASE_NAME"
-
-          gh release create ${{ github.ref }} --generate-notes --prerelease
-
-          TEMP_DIR=$(mktemp -d)
-          echo $TEMP_DIR
-
-          find ./bin/* -type f -exec cp --parents \{\} ${TEMP_DIR}/ \;
-
-          ls $TEMP_DIR
-          tar -czvf kuasar-v${version}-vendor.tar.gz -C ${TEMP_DIR} .
-
-          # 确保使用正确的 RELEASE_NAME 和 version 变量
-          gh release upload $RELEASE_NAME kuasar-v${version}-vendor.tar.gz
+          path: _artifacts
+      - name: create release
         env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_NAME: ${{ github.ref }}aaaaa
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create ${{ env.RELEASE_VERSION }}
+          for f in ./_artifacts/*/*; do gh release upload ${{ env.RELEASE_VERSION }} $f; done
