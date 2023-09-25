@@ -174,4 +174,4 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ env.RELEASE_VERSION }}
-          for f in ./_artifacts/*/*; do gh release upload ${{ env.RELEASE_VERSION }} $f; done
+          for f in ./_artifacts/*/*/*; do gh release upload ${{ env.RELEASE_VERSION }} $f; done
