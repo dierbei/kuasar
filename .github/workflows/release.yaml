@@ -185,5 +185,5 @@ jobs:
           find ./_artifacts -type f | xargs -I {} cp {} _dist/
           tar -czvf ${{ env.ARCHIVE_NAME }} -C _dist .
           gh release upload ${{ env.RELEASE_VERSION }} ${{ env.ARCHIVE_NAME }}
-          tar --exclude='./_dist' --exclude='./_artifacts' -czvf ${{ env.VENDOR_NAME }} .
+          tar --exclude='_dist' --exclude='_artifacts' --exclude="${{ env.ARCHIVE_NAME }}" -czvf "${{ env.VENDOR_NAME }}" -C . .
           gh release upload ${{ env.RELEASE_VERSION }} ${{ env.VENDOR_NAME }}
