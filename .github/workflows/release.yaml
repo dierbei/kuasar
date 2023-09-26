@@ -174,16 +174,16 @@ jobs:
           echo "VENDOR_NAME=kuasar-${GITHUB_REF:10}-vendor.tar.gz" >> $GITHUB_ENV
       - uses: actions/download-artifact@v3
         with:
-          path: _artifacts
+          path: /_artifacts
       - name: create release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mkdir -p _dist
+          mkdir -p /_dist
           gh release create ${{ env.RELEASE_VERSION }}
           # Recursively find all files
-          find ./_artifacts -type f | xargs -I {} cp {} _dist/
-          tar -czvf ${{ env.ARCHIVE_NAME }} -C _dist .
-          gh release upload ${{ env.RELEASE_VERSION }} ${{ env.ARCHIVE_NAME }}
-          tar --exclude='_dist' --exclude='_artifacts' --exclude="${{ env.ARCHIVE_NAME }}" -czvf "${{ env.VENDOR_NAME }}" -C . .
+          find /_artifacts -type f | xargs -I {} cp {} /_dist/
+          tar -czvf /${{ env.ARCHIVE_NAME }} -C /_dist .
+          gh release upload ${{ env.RELEASE_VERSION }} /${{ env.ARCHIVE_NAME }}
+          tar -czvf ${{ env.VENDOR_NAME }} -C . .
           gh release upload ${{ env.RELEASE_VERSION }} ${{ env.VENDOR_NAME }}
