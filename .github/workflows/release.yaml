@@ -176,8 +176,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create ${{ env.RELEASE_VERSION }}
-          tar -czvf ${{ env.VENDOR_NAME }} .
+          mkdir temp
+          cp -r ./* temp/
+          tar -czvf ${{ env.VENDOR_NAME }} -C temp .
           gh release upload ${{ env.RELEASE_VERSION }} ${{ env.VENDOR_NAME }}
       - uses: actions/download-artifact@v3
         with:
