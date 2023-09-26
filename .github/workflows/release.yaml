@@ -172,7 +172,7 @@ jobs:
           echo "RELEASE_VERSION=${GITHUB_REF:10}" >> $GITHUB_ENV
           echo "ARCHIVE_NAME=kuasar-${GITHUB_REF:10}-linux-amd64.tar.gz" >> $GITHUB_ENV
           echo "VENDOR_NAME=kuasar-${GITHUB_REF:10}-vendor.tar.gz" >> $GITHUB_ENV
-      - name: create release
+      - name: Package vendor
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -182,6 +182,9 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: _artifacts
+      - name: Package release
+        env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p _dist
           find _artifacts -type f | xargs -I {} cp {} _dist/
