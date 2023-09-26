@@ -176,6 +176,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          gh release create ${{ env.RELEASE_VERSION }} --generate-notes
           mkdir ../temp
           cp -r ./* ../temp/
           tar -czvf ${{ env.VENDOR_NAME }} -C ../temp .
