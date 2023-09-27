@@ -22,8 +22,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v1.1.2
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Build vmm
-        run: sudo -E make vmm HYPERVISOR={{ matrix.features }}
+        run: sudo -E make vmm HYPERVISOR=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -47,7 +51,7 @@ jobs:
     strategy:
       matrix:
         features: ["wasmedge"]
-    
+  
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -56,7 +60,7 @@ jobs:
         if: ${{ matrix.features }} == 'wasmedge'
         run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v 0.11.2 >> /dev/null
       - name: Build wasm
-        run: make wasm WASM_RUNTIME={{ matrix.features }}
+        run: make wasm WASM_RUNTIME=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -188,6 +192,7 @@ jobs:
       - shim
       - containerd
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
       - name: Set RELEASE_VERSION ENV var
