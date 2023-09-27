@@ -22,19 +22,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
-      - run: rustup toolchain install nightly
-      - name: Install containerd
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y containerd
-      - name: Start containerd
-        run: |
-          sudo systemctl start containerd
-          sudo systemctl enable containerd
-      - name: Set up Rust
-        run: sudo -E $(command -v rustup) default stable
       - name: Build vmm
-        run: sudo -E make vmm HYPERVISOR=${{ matrix.features }}
+        run: make vmm HYPERVISOR=${{ matrix.features }} RUNTIME=docker
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
