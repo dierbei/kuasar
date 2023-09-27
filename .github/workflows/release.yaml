@@ -22,6 +22,14 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
+      - name: Install containerd
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y containerd
+    - name: Start containerd
+      run: |
+        sudo systemctl start containerd
+        sudo systemctl enable containerd
       - name: Build vmm
         run: make vmm HYPERVISOR=${{ matrix.features }}
       - name: Upload Artifacts
