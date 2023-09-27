@@ -10,7 +10,7 @@ BIN_DIR := /usr/local/bin
 SYSTEMD_SERVICE_DIR := /usr/lib/systemd/system
 SYSTEMD_CONF_DIR := /etc/sysconfig
 
-.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install 
+.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install install/containerd
 
 all: vmm quark wasm
 
@@ -41,11 +41,6 @@ bin/wasm-sandboxer:
 bin/quark-sandboxer:
 	@cd quark && cargo build --release
 	@mkdir -p bin && cp quark/target/release/quark-sandboxer bin/quark-sandboxer
-
-bin/containerd:
-	@bash curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-	@bash tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
-	@bash cp docs/config.toml bin/
 
 wasm: bin/wasm-sandboxer
 quark: bin/quark-sandboxer
@@ -90,5 +85,10 @@ install-quark:
 	@install -p -m 550 bin/quark-sandboxer ${DEST_DIR}${BIN_DIR}/quark-sandboxer
 	@install -d -m 750 ${DEST_DIR}${SYSTEMD_SERVICE_DIR}
 	@install -p -m 640 quark/service/kuasar-quark.service ${DEST_DIR}${SYSTEMD_SERVICE_DIR}/kuasar-quark.service
+
+install/containerd:
+	@bash curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
+	@bash tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+	@bash cp docs/config.toml bin/
 
 install: all install-vmm install-wasm install-quark
