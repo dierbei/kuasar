@@ -31,8 +31,10 @@ jobs:
         run: |
           sudo systemctl start containerd
           sudo systemctl enable containerd
+      - name: Set up Rust
+        run: rustup default stable
       - name: Build vmm
-        run: cargo -v && sudo PATH="$PATH" make vmm HYPERVISOR=${{ matrix.features }} 
+        run: sudo make vmm HYPERVISOR=${{ matrix.features }} 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
