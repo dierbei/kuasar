@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build vmm
-        run: sudo -E $(command -v make) vmm HYPERVISOR=${{ matrix.features }}
+        run: sudo -E $(command -v cargo) make vmm HYPERVISOR=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -170,6 +170,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - uses: actions/checkout@v3
       - name: Download and Extract Containerd
         run: make install/containerd
       - name: Upload Artifacts
