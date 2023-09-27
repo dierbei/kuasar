@@ -15,8 +15,8 @@ SYSTEMD_CONF_DIR := /etc/sysconfig
 all: vmm quark wasm
 
 bin/vmm-sandboxer:
-	@cd vmm/sandbox && cargo build --release --features=${HYPERVISOR}
-	@mkdir -p bin && cp vmm/sandbox/target/release/vmm-sandboxer bin/vmm-sandboxer
+	cd vmm/sandbox && cargo build --release --features=${HYPERVISOR}
+	mkdir -p bin && cp vmm/sandbox/target/release/vmm-sandboxer bin/vmm-sandboxer
 	
 bin/vmm-task:
 	@cd vmm/task && cargo build --release --target=${ARCH}-unknown-linux-musl
