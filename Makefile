@@ -87,8 +87,8 @@ install-quark:
 	@install -p -m 640 quark/service/kuasar-quark.service ${DEST_DIR}${SYSTEMD_SERVICE_DIR}/kuasar-quark.service
 
 install/containerd:
-	@curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-	@bash tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
-	@bash cp docs/config.toml bin/
+	curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
+	tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+	cp docs/config.toml bin/
 
 install: all install-vmm install-wasm install-quark
