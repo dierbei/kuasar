@@ -22,11 +22,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
+      - run: rustup toolchain install nightly
       - name: Install containerd
         run: |
           sudo apt-get update
           sudo apt-get install -y containerd
-          sudo rustup default stable
       - name: Start containerd
         run: |
           sudo systemctl start containerd
