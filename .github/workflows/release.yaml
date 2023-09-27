@@ -31,7 +31,7 @@ jobs:
           sudo systemctl start containerd
           sudo systemctl enable containerd
       - name: Build vmm
-        run: sudo -E make vmm HYPERVISOR=${{ matrix.features }} 
+        run: sudo PATH=$PATH make vmm HYPERVISOR=${{ matrix.features }} 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
