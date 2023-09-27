@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build vmm
-        run: sudo make vmm HYPERVISOR=${{ matrix.features }} RUNTIME=docker
+        run: sudo make vmm HYPERVISOR=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
