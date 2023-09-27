@@ -24,11 +24,11 @@ bin/vmm-task:
 
 bin/vmlinux.bin:
 	@bash -x vmm/scripts/kernel/${HYPERVISOR}/build.sh ${KERNEL_VERSION}
-	@mkdir -p bin && sudo cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && sudo rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
+	@mkdir -p bin && cp vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin bin/vmlinux.bin && rm vmm/scripts/kernel/${HYPERVISOR}/vmlinux.bin
 
 bin/kuasar.img:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh image
-	@mkdir -p bin && sudo cp /tmp/kuasar.img bin/kuasar.img && sudo rm /tmp/kuasar.img
+	@mkdir -p bin && cp /tmp/kuasar.img bin/kuasar.img && rm /tmp/kuasar.img
 
 bin/kuasar.initrd:
 	@bash -x vmm/scripts/image/${GUESTOS_IMAGE}/build.sh initrd
@@ -41,6 +41,11 @@ bin/wasm-sandboxer:
 bin/quark-sandboxer:
 	@cd quark && cargo build --release
 	@mkdir -p bin && cp quark/target/release/quark-sandboxer bin/quark-sandboxer
+
+bin/containerd:
+	@bash curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
+	@bash tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+	@bash cp docs/config.toml bin/
 
 wasm: bin/wasm-sandboxer
 quark: bin/quark-sandboxer
