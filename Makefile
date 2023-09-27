@@ -94,8 +94,8 @@ install/containerd:
 install: all install-vmm install-wasm install-quark
 
 vendor:
-	cargo vendor quark
-	cargo vendor shim
-	cargo vendor vmm/sandbox
-	cargo vendor vmm/task
-	cargo vendor wasm
+	(cd quark && cargo vendor)
+	(cd shim && cargo vendor)
+	(cd vmm/sandbox && cargo vendor)
+	(cd vmm/task && cargo vendor)
+	(cd wasm && cargo vendor)
