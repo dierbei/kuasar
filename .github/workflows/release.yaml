@@ -34,7 +34,7 @@ jobs:
       - name: Set up Rust
         run: rustup default stable
       - name: Build vmm
-        run: sudo make vmm HYPERVISOR=${{ matrix.features }} 
+        run: sudo PATH="$PATH" make vmm HYPERVISOR=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
