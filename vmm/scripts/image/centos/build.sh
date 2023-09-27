@@ -80,7 +80,7 @@ docker)
 		-v "${REPO_DIR}":/kuasar \
 		-v "${ROOTFS_DIR}":"/tmp/kuasar-rootfs" \
 		${IMAGE_NAME} \
-		sudo bash -x /kuasar/vmm/scripts/image/centos/build_rootfs.sh
+		bash -x /kuasar/vmm/scripts/image/centos/build_rootfs.sh
 	fn_check_result $? "docker run ${container_name} return error!"
 	;;
 isulad)
