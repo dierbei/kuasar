@@ -172,7 +172,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download and Extract Containerd
-        run: make install/containerd
+        run: sudo -E $(command -v curl) make install/containerd
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
