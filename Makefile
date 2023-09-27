@@ -88,7 +88,7 @@ install-quark:
 
 install/containerd:
 	curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-	tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+	mkdir bin && tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
 	cp docs/config.toml bin/
 
 install: all install-vmm install-wasm install-quark
