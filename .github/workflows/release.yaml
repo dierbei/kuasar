@@ -77,95 +77,6 @@ jobs:
           name: shim
           path: shim/bin/
 
-  # buildSandboxer:
-  #   strategy:
-  #     matrix:
-  #       directories: [
-  #         "wasmedge",
-  #         "quark", 
-  #         "cloud_hypervisor",
-  #       ]
-  #       include:
-  #         - directories: wasmedge
-  #           command: bin/wasm-sandboxer WASM_RUNTIME=wasmedge
-  #           wasmEdge: 0.11.2
-  #         - directories: quark
-  #           command: bin/quark-sandboxer
-  #         - directories: cloud_hypervisor
-  #           command: bin/vmm-sandboxer HYPERVISOR=cloud_hypervisor && cp vmm/sandbox/config_clh.toml bin/config_clh.toml
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - run: rustup toolchain install nightly --component rustfmt
-  #     - name: Install Protoc
-  #       uses: arduino/setup-protoc@v1.1.2
-  #       with:
-  #         repo-token: ${{ secrets.GITHUB_TOKEN }}
-  #     - name: Install WasmEdge
-  #       if: ${{ matrix.wasmEdge }}
-  #       run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v ${{ matrix.wasmEdge }} >> /dev/null
-  #     - name: Build
-  #       run: make ${{ matrix.command }}
-  #     - name: Upload Artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ matrix.directories }}
-  #         path: bin/
-      
-  # buildShim:
-  #   strategy:
-  #     matrix:
-  #       directories: [
-  #         "containerd-shim-kuasar-vmm-v2", 
-  #         "containerd-shim-kuasar-wasm-v2"
-  #       ]
-  #       include:
-  #         - directories: containerd-shim-kuasar-vmm-v2
-  #           command: bin/containerd-shim-kuasar-vmm-v2
-  #         - directories: containerd-shim-kuasar-wasm-v2
-  #           command: bin/containerd-shim-kuasar-wasm-v2
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Build
-  #       working-directory: shim
-  #       run: make ${{ matrix.command }}
-  #     - name: Upload Artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: ${{ matrix.directories }}
-  #         path: shim/bin/
-        
-  # kuasar-image:
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Build kuasar.img
-  #       run: RUNTIME=docker make bin/kuasar.img
-  #       working-directory: .
-  #     - name: Upload Artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: kuasar.img
-  #         path: bin/
-  
-  # vmlinux-bin:
-  #   runs-on: ubuntu-latest
-  #   timeout-minutes: 30
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Build vmlinux.bin
-  #       run: make bin/vmlinux.bin
-  #       working-directory: .
-  #     - name: Upload Artifacts
-  #       uses: actions/upload-artifact@v3
-  #       with:
-  #         name: vmlinux.bin
-  #         path: bin/
-
   containerd:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -202,6 +113,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ env.RELEASE_VERSION }} --generate-notes
+          make vendor
           mkdir ../temp
           cp -r ./* ../temp/
           tar -czvf ${{ env.VENDOR_NAME }} -C ../temp .
