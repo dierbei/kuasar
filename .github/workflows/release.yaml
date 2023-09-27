@@ -171,8 +171,6 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v3
-      - name: Install curl
-        run: sudo apt-get update && sudo apt-get install -y curl
       - name: Download and Extract Containerd
         run: make install/containerd
       - name: Upload Artifacts
