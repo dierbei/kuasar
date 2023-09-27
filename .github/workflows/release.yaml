@@ -26,12 +26,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y containerd
+          sudo rustup default stable
       - name: Start containerd
         run: |
           sudo systemctl start containerd
           sudo systemctl enable containerd
       - name: Build vmm
-        run: sudo PATH=$PATH make vmm HYPERVISOR=${{ matrix.features }} 
+        run: sudo -E make vmm HYPERVISOR=${{ matrix.features }} 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
