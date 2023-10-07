@@ -1,9 +1,9 @@
 #!/bin/bash
 
-curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-mkdir bin && tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+sudo curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
+sudo mkdir bin && tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
 
-cat > bin/config.toml <<EOF
+sudo cat > bin/config.toml <<EOF
 version = 2
 
 [plugins."io.containerd.grpc.v1.cri"]
@@ -37,4 +37,4 @@ type = "sandbox"
 address = "/run/wasm-sandboxer.sock"
 EOF
 
-echo "config.toml has been created!"
+sudo echo "config.toml has been created!"
