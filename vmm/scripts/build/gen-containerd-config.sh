@@ -3,7 +3,7 @@
 sudo curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
 sudo mkdir bin && sudo tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
 
-sudo cat > bin/config.toml <<EOF
+sudo tee bin/config.toml > /dev/null <<EOF
 version = 2
 
 [plugins."io.containerd.grpc.v1.cri"]
