@@ -83,7 +83,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download and Extract Containerd
-        run: make install/containerd
+        run: ./vmm/scripts/gen-containerd-config.sh
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -111,13 +111,7 @@ jobs:
       - name: Package vendor
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create ${{ env.RELEASE_VERSION }} --generate-notes
-          make vendor
-          mkdir ../temp
-          cp -r ./* ../temp/
-          tar -czvf ${{ env.VENDOR_NAME }} -C ../temp .
-          gh release upload ${{ env.RELEASE_VERSION }} ${{ env.VENDOR_NAME }}
+        run: ./vmm/scripts/cargo-vendor.sh
       - uses: actions/download-artifact@v3
         with:
           path: _artifacts

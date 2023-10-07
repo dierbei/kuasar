@@ -10,7 +10,7 @@ BIN_DIR := /usr/local/bin
 SYSTEMD_SERVICE_DIR := /usr/lib/systemd/system
 SYSTEMD_CONF_DIR := /etc/sysconfig
 
-.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install install/containerd vendor
+.PHONY: vmm wasm quark clean all install-vmm install-wasm install-quark install install/containerd
 
 all: vmm quark wasm
 
@@ -92,10 +92,3 @@ install/containerd:
 	cp docs/config.toml bin/
 
 install: all install-vmm install-wasm install-quark
-
-vendor:
-	(cd quark && cargo vendor)
-	(cd shim && cargo vendor)
-	(cd vmm/sandbox && cargo vendor)
-	(cd vmm/task && cargo vendor)
-	(cd wasm && cargo vendor)
