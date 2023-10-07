@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo gh release create ${{ env.RELEASE_VERSION }} --generate-notes
+sudo gh release create $RELEASE_VERSION --generate-notes
 
 directories=(
     "quark"
@@ -16,5 +16,5 @@ done
 
 sudo mkdir ../temp
 sudo cp -r ./* ../temp/
-sudo tar -czvf ${{ env.VENDOR_NAME }} -C ../temp .
-sudo gh release upload ${{ env.RELEASE_VERSION }} ${{ env.VENDOR_NAME }}
+sudo tar -czvf $VENDOR_NAME -C ../temp .
+sudo gh release upload $RELEASE_VERSION $VENDOR_NAME
