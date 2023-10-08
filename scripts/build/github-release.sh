@@ -15,7 +15,7 @@
 
 set -e
 
-mkdir -p _dist
-find _artifacts -type f | xargs -I {} cp {} _dist/
-tar -czvf $ARCHIVE_NAME -C _dist .
-gh release upload $RELEASE_VERSION $ARCHIVE_NAME
+# mkdir -p _dist
+# find _artifacts -type f | xargs -I {} cp {} _dist/
+# tar -czvf $ARCHIVE_NAME -C _dist .
+# gh release upload $RELEASE_VERSION $ARCHIVE_NAME
