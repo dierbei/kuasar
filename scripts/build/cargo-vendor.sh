@@ -15,6 +15,8 @@
 
 set -e
 
+export PATH="$PATH:/home/runner/.cargo/bin"
+
 gh release create $RELEASE_VERSION --generate-notes
 
 directories=(
