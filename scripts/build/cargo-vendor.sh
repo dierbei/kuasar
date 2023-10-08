@@ -22,7 +22,7 @@ directories=(
     "shim"
     "vmm/sandbox"
     "vmm/task"
-    vmm/common
+    "vmm/common"
     "wasm"
 )
 
