@@ -28,7 +28,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.features }}
-          path: bin/
+          path: |
+            bin/kuasar.img 
+            bin/vmlinux.bin 
+            bin/vmm-sandboxer
   
   quark:
     runs-on: ubuntu-latest
