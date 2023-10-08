@@ -101,12 +101,12 @@ jobs:
   release:
     permissions:
       contents: write
-    # needs:
-    #   - vmm
-    #   - quark
-    #   - wasm
-    #   - shim
-    #   - containerd
+    needs:
+      - vmm
+      - quark
+      - wasm
+      - shim
+      - containerd
     runs-on: ubuntu-latest
 
     steps:
