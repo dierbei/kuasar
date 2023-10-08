@@ -101,12 +101,12 @@ jobs:
   release:
     permissions:
       contents: write
-    needs:
-      - vmm
-      - quark
-      - wasm
-      - shim
-      - containerd
+    # needs:
+    #   - vmm
+    #   - quark
+    #   - wasm
+    #   - shim
+    #   - containerd
     runs-on: ubuntu-latest
 
     steps:
@@ -126,6 +126,6 @@ jobs:
           path: _artifacts
       - name: Package release
         env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: sudo -E ./scripts/build/github-release.sh
         shell: bash
