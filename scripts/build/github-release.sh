@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 mkdir -p _dist
 find _artifacts -type f | xargs -I {} cp {} _dist/
 tar -czvf $ARCHIVE_NAME -C _dist .
