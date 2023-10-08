@@ -127,5 +127,5 @@ jobs:
       - name: Package release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ls scripts/build && sudo -E ./scripts/build/github-release.sh
+        run: sudo -E ./scripts/build/github-release.sh
         shell: bash
