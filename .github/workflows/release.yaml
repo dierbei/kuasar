@@ -116,13 +116,7 @@ jobs:
       - name: Package vendor
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create $RELEASE_VERSION --generate-notes
-          sudo -E ./scripts/build/cargo-vendor.sh
-          mkdir ../temp
-          cp -r ./* ../temp/
-          tar -czvf $VENDOR_NAME -C ../temp .
-          gh release upload $RELEASE_VERSION $VENDOR_NAME
+        run: sudo -E ./scripts/build/cargo-vendor.sh
         shell: bash
       - uses: actions/download-artifact@v3
         with:
