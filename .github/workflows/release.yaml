@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: quark
-          path: bin/
+          path: bin/quark-sandboxer
   
   wasm: 
     strategy:
@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.features }}
-          path: bin/
+          path: bin/wasm-sandboxer
   
   shim:
     runs-on: ubuntu-latest
@@ -75,7 +75,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: shim
-          path: shim/bin/
+          path: | 
+            bin/containerd-shim-kuasar-vmm-v2 
+            bin/containerd-shim-kuasar-wasm-v2
 
   containerd:
     runs-on: ubuntu-latest
@@ -83,13 +85,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download and Extract Containerd
-        run: ./scripts/build/gen-containerd-config.sh
+        run: sudo -E ./scripts/build/gen-containerd-config.sh
         shell: bash
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: containerd
-          path: bin/
+          path: | 
+            bin/containerd 
+            bin/config.toml
 
   release:
     permissions:
@@ -114,7 +118,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create $RELEASE_VERSION --generate-notes
-          ./scripts/build/cargo-vendor.sh
+          sudo -E ./scripts/build/cargo-vendor.sh
           mkdir ../temp
           cp -r ./* ../temp/
           tar -czvf $VENDOR_NAME -C ../temp .

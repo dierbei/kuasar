@@ -1,9 +1,24 @@
 #!/bin/bash
+# Copyright 2022 The Kuasar Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-sudo curl -LJO https://github.com/containerd/containerd/releases/download/v1.7.0/containerd-1.7.0-linux-amd64.tar.gz
-sudo mkdir bin && sudo tar -C bin -xzvf containerd-1.7.0-linux-amd64.tar.gz
+set -e
 
-sudo tee bin/config.toml > /dev/null <<EOF
+git clone https://github.com/kuasar-io/containerd.git 
+make -C containerd bin/containerd mkdir bin && mv containerd/bin/containerd bin
+
+tee bin/config.toml > /dev/null <<EOF
 version = 2
 
 [plugins."io.containerd.grpc.v1.cri"]
@@ -37,4 +52,4 @@ type = "sandbox"
 address = "/run/wasm-sandboxer.sock"
 EOF
 
-sudo echo "config.toml has been created!"
+echo "config.toml has been created!"
