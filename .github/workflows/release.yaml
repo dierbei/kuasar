@@ -59,7 +59,7 @@ jobs:
         if: ${{ matrix.features }} == 'wasmedge'
         run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v 0.11.2 >> /dev/null
       - name: Build wasm
-        run: echo ${GITHUB_REF} && make wasm WASM_RUNTIME=${{ matrix.features }}
+        run: make wasm WASM_RUNTIME=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -88,7 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build Containerd
-        run: sudo -E ./scripts/build/build-containerd.sh
+        run: echo "RELEASE_VERSION=${GITHUB_REF:10}" && sudo -E ./scripts/build/build-containerd.sh
         shell: bash
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
