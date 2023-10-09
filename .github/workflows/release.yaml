@@ -59,7 +59,7 @@ jobs:
         if: ${{ matrix.features }} == 'wasmedge'
         run: curl -sSf https://raw.githubusercontent.com/WasmEdge/WasmEdge/master/utils/install.sh | bash -s -- -v 0.11.2 >> /dev/null
       - name: Build wasm
-        run: make wasm WASM_RUNTIME=${{ matrix.features }}
+        run: echo ${GITHUB_REF} && make wasm WASM_RUNTIME=${{ matrix.features }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
