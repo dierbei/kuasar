@@ -51,5 +51,3 @@ address = "/run/quark-sandboxer.sock"
 type = "sandbox"
 address = "/run/wasm-sandboxer.sock"
 EOF
-
-rm -rf containerd
